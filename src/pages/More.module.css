@@ -1,0 +1,168 @@
+
+.container {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.header {
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.content {
+  padding: 1rem;
+  padding-bottom: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profileCard {
+  padding: 1.5rem;
+}
+
+.profileRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  background-color: #fed7aa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarText {
+  color: #ea580c;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.profileInfo {
+  flex: 1;
+}
+
+.profileName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.profileUrl {
+  color: #6b7280;
+}
+
+.profileRole {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  padding-left: 0.25rem;
+}
+
+.menuCard {
+  padding: 0;
+}
+
+.menuItem {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.menuItem:last-child {
+  border-bottom: none;
+}
+
+.menuItem:hover {
+  background-color: #f9fafb;
+}
+
+.menuIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+}
+
+.menuContent {
+  flex: 1;
+  text-align: left;
+}
+
+.menuLabel {
+  font-weight: 500;
+  color: #111827;
+}
+
+.menuDescription {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.menuArrow {
+  color: #9ca3af;
+}
+
+.appInfo {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.appDetails {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.logoutBtn {
+  width: 100%;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.logoutBtn:hover {
+  background-color: #fef2f2;
+}
