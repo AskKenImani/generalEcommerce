@@ -69,7 +69,7 @@ const Landing = () => {
           </p>
           <Link to="/signup">
             <Button size="lg" className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 px-8 py-4 text-lg">
-              Start Your Free Trial
+              Surf Store
             </Button>
           </Link>
         </div>
