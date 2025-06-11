@@ -1,76 +1,122 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  doc,
+  getDoc
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Search, Filter, Users, Mail, Phone, MapPin } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 
+const AddCustomerForm = ({ onAdd }) => {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', location: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    if (!form.name || !form.email) return;
+    setLoading(true);
+    try {
+      await addDoc(collection(db, 'customers'), {
+        ...form,
+        orders: 0,
+        totalSpent: 0,
+        status: 'New',
+        createdAt: new Date()
+      });
+      onAdd();
+    } catch (err) {
+      console.error('Add customer error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
+      <Input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+      <Input name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} />
+      <Input name="location" placeholder="Location" value={form.location} onChange={handleChange} />
+      <Button disabled={loading} onClick={handleSubmit} className="w-full bg-green-600">
+        {loading ? 'Adding...' : 'Add Customer'}
+      </Button>
+    </div>
+  );
+};
+
+const ViewCustomerCard = ({ customer }) => (
+  <div className="space-y-3">
+    <h3 className="text-lg font-semibold text-gray-900">{customer.name}</h3>
+    <p>Email: {customer.email}</p>
+    <p>Phone: {customer.phone}</p>
+    <p>Location: {customer.location}</p>
+    <p>Status: {customer.status}</p>
+    <p>Orders: {customer.orders}</p>
+    <p>Total Spent: ₦{customer.totalSpent}</p>
+  </div>
+);
+
 const Customers = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [openAdd, setOpenAdd] = useState(false);
+  const [openView, setOpenView] = useState(false);
+  const { profile } = useUserProfile();
 
-  const mockCustomers = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+234 801 234 5678',
-      location: 'Lagos, Nigeria',
-      orders: 5,
-      totalSpent: '₦45,000',
-      status: 'Active',
-      avatar: 'JD'
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      phone: '+234 802 345 6789',
-      location: 'Abuja, Nigeria',
-      orders: 3,
-      totalSpent: '₦28,500',
-      status: 'Active',
-      avatar: 'JS'
-    },
-    {
-      id: 3,
-      name: 'Mike Johnson',
-      email: 'mike@example.com',
-      phone: '+234 803 456 7890',
-      location: 'Port Harcourt, Nigeria',
-      orders: 1,
-      totalSpent: '₦12,000',
-      status: 'New',
-      avatar: 'MJ'
-    }
-  ];
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'customers'), (snap) => {
+      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCustomers(data);
+    });
+    return () => unsub();
+  }, []);
 
-  const getStatusColor = (status: string) => {
+  const filteredCustomers = customers.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusColor = (status) => {
     switch (status) {
       case 'Active': return 'bg-green-100 text-green-700';
       case 'New': return 'bg-blue-100 text-blue-700';
-      case 'Inactive': return 'bg-gray-100 text-gray-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
+      <div className="bg-white border-b px-4 py-4">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold text-gray-900">Customers</h1>
-          <Button className="bg-green-600 hover:bg-green-700">
-            <Users className="w-4 h-4 mr-2" />
-            Add Customer
-          </Button>
+          <h1 className="text-xl font-semibold">Customers</h1>
+          <Dialog open={openAdd} onOpenChange={setOpenAdd}>
+            <DialogTrigger asChild>
+              <Button className="bg-green-600">
+                <Users className="w-4 h-4 mr-2" /> Add Customer
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <AddCustomerForm onAdd={() => setOpenAdd(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
-        
-        {/* Search and Filter */}
+
         <div className="flex space-x-3">
           <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search customers..."
               value={searchQuery}
@@ -79,88 +125,51 @@ const Customers = () => {
             />
           </div>
           <Button variant="outline">
-            <Filter className="w-4 h-4 mr-2" />
-            Filter
+            <Filter className="w-4 h-4 mr-2" /> Filter
           </Button>
         </div>
       </div>
 
       <div className="p-4 space-y-4 pb-20">
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900">3</div>
-              <div className="text-gray-600 text-sm">Total Customers</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">2</div>
-              <div className="text-gray-600 text-sm">Active</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">1</div>
-              <div className="text-gray-600 text-sm">New This Month</div>
-            </CardContent>
-          </Card>
+          <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold">{customers.length}</div><div>Total Customers</div></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-green-600">{customers.filter(c => c.status === 'Active').length}</div><div>Active</div></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><div className="text-2xl font-bold text-blue-600">{customers.filter(c => c.status === 'New').length}</div><div>New This Month</div></CardContent></Card>
         </div>
 
-        {/* Customers List */}
         <div className="space-y-3">
-          {mockCustomers.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No customers yet</h3>
-                <p className="text-gray-600 mb-4">Your customers will appear here once they make their first purchase.</p>
-                <Button className="bg-green-600 hover:bg-green-700">
-                  <Users className="w-4 h-4 mr-2" />
-                  Add Your First Customer
-                </Button>
-              </CardContent>
-            </Card>
+          {filteredCustomers.length === 0 ? (
+            <Card><CardContent className="p-8 text-center">No customers found.</CardContent></Card>
           ) : (
-            mockCustomers.map((customer) => (
-              <Card key={customer.id} className="hover:shadow-md transition-shadow">
+            filteredCustomers.map((customer) => (
+              <Card key={customer.id} className="hover:shadow-md">
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-700 font-semibold">{customer.avatar}</span>
+                      <span className="text-green-700 font-semibold">{customer.name?.slice(0, 2).toUpperCase()}</span>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900">{customer.name}</h3>
-                        <Badge className={getStatusColor(customer.status)}>
-                          {customer.status}
-                        </Badge>
+                        <h3 className="font-semibold">{customer.name}</h3>
+                        <Badge className={getStatusColor(customer.status)}>{customer.status}</Badge>
                       </div>
-                      
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div className="flex items-center space-x-2">
-                          <Mail className="w-3 h-3" />
-                          <span>{customer.email}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Phone className="w-3 h-3" />
-                          <span>{customer.phone}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="w-3 h-3" />
-                          <span>{customer.location}</span>
-                        </div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <div className="flex items-center space-x-2"><Mail className="w-3 h-3" /><span>{customer.email}</span></div>
+                        <div className="flex items-center space-x-2"><Phone className="w-3 h-3" /><span>{customer.phone}</span></div>
+                        <div className="flex items-center space-x-2"><MapPin className="w-3 h-3" /><span>{customer.location}</span></div>
                       </div>
-                      
-                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                        <div className="text-sm">
-                          <span className="text-gray-600">{customer.orders} orders • </span>
-                          <span className="font-semibold text-gray-900">{customer.totalSpent}</span>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          View Profile
-                        </Button>
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                        <div className="text-sm text-gray-600">{customer.orders} orders • ₦{customer.totalSpent}</div>
+                        <Dialog open={openView} onOpenChange={setOpenView}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" onClick={() => setSelectedCustomer(customer)}>
+                              View Profile
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            {selectedCustomer && <ViewCustomerCard customer={selectedCustomer} />}
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
                   </div>

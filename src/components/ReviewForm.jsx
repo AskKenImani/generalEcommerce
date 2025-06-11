@@ -25,6 +25,7 @@ const ReviewForm = () => {
       await addReview(rating, comment.trim(), `${profile.firstName} ${profile.lastName}`);
       setRating(0);
       setComment('');
+      alert("✅ Review submitted!");
     } catch (error) {
       console.error('Error submitting review:', error);
     } finally {

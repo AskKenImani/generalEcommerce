@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -11,7 +10,7 @@ export const useUserProfile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user) {
+      if (!user?.uid) {
         setProfile(null);
         setLoading(false);
         return;
@@ -20,17 +19,19 @@ export const useUserProfile = () => {
       try {
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
           const data = docSnap.data();
           setProfile({
             id: user.uid,
             ...data,
-            createdAt: data.createdAt?.toDate() || new Date()
+            createdAt: data.createdAt?.toDate?.() || new Date(),
           });
+        } else {
+          console.warn('User profile not found.');
         }
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        console.error('Error fetching user profile:', error.message);
       } finally {
         setLoading(false);
       }

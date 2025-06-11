@@ -6,6 +6,7 @@ import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { Search, Filter, ShoppingCart, Calendar } from 'lucide-react';
 import Navigation from '../components/Navigation';
+import { Link } from 'react-router-dom';
 import styles from './Orders.module.css';
 
 const Orders = () => {
@@ -56,10 +57,12 @@ const Orders = () => {
       <div className={styles.header}>
         <div className={styles.headerTop}>
           <h1 className={styles.title}>Orders</h1>
-          <Button className={styles.newOrderBtn}>
-            <ShoppingCart className="w-4 h-4 mr-2" />
-            New Order
-          </Button>
+          <Link to ="/store">
+            <Button className={styles.newOrderBtn}>
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              New Order
+            </Button>
+          </Link>
         </div>
         
         <div className={styles.searchSection}>

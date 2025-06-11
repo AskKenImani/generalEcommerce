@@ -14,9 +14,24 @@ import {
   Shield
 } from 'lucide-react';
 import Navigation from '../components/Navigation';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 import styles from './More.module.css';
 
 const More = () => {
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    navigate('/login');
+  } catch (error) {
+    console.error('Error logging out:', error);
+    alert('Failed to log out');
+  }
+};
+
   const menuSections = [
     {
       title: 'Account',
@@ -111,10 +126,12 @@ const More = () => {
         <Button 
           variant="outline" 
           className={styles.logoutBtn}
+          onClick={handleLogout}
         >
           <LogOut className="w-4 h-4 mr-2" />
           Log Out
         </Button>
+        
       </div>
 
       <Navigation />

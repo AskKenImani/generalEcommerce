@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -38,7 +38,8 @@ export const useReviews = () => {
         userName,
         rating,
         comment,
-        createdAt: new Date()
+        createdAt: Timestamp.now()
+        // alert("✅ Review submitted!");
       });
     } catch (error) {
       console.error('Error adding review:', error);

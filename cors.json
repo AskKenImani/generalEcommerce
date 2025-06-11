@@ -1,0 +1,9 @@
+[
+    {
+      "origin": ["http://localhost:8081", "https://genecomm.netlify.app"],
+      "method": ["GET", "POST", "PUT", "DELETE"],
+      "maxAgeSeconds": 3600,
+      "responseHeader": ["Content-Type", "Authorization"]
+    }
+  ]
+  
