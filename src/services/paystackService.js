@@ -14,10 +14,7 @@ export class PaystackService {
       currency: 'NGN',
       metadata,
       callback: (response) => {
-        console.log('Payment response received:', response);
-
         const reference = response.reference;
-
         fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
           headers: {
             Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
@@ -26,10 +23,13 @@ export class PaystackService {
         })
           .then(res => res.json())
           .then(data => {
-            console.log('Verification result:', data);
             if (data.status && data.data.status === "success") {
-              onSuccess(data.data); 
-              PaystackService.printReceipt(data.data); 
+              try {
+                onSuccess(data.data);
+                PaystackService.printReceipt(data.data);
+              } catch (error) {
+                console.error("Error handling success:", error);
+              }
             } else {
               console.error('Verification failed:', data);
               onCancel();
@@ -50,17 +50,36 @@ export class PaystackService {
   }
 
   static printReceipt(transactionData) {
-    const receiptWindow = window.open('', '', 'width=600,height=600');
+    const receiptWindow = window.open('', '', 'width=600,height=700');
     if (!receiptWindow) return;
-
-    receiptWindow.document.write('<html><head><title>Receipt</title></head><body>');
-    receiptWindow.document.write('<h1>Payment Receipt</h1>');
-    receiptWindow.document.write(`<p><strong>Reference:</strong> ${transactionData.reference}</p>`);
-    receiptWindow.document.write(`<p><strong>Amount:</strong> ₦${(transactionData.amount / 100).toLocaleString()}</p>`);
-    receiptWindow.document.write(`<p><strong>Status:</strong> ${transactionData.status}</p>`);
-    receiptWindow.document.write(`<p><strong>Paid At:</strong> ${transactionData.paid_at}</p>`);
-    receiptWindow.document.write('</body></html>');
+  
+    const logoUrl = 'public\favicon.png';
+  
+    receiptWindow.document.write(`
+      <html>
+        <head>
+          <title>Receipt</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { color: #333; }
+            .logo { max-width: 150px; margin-bottom: 20px; }
+            .info { margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          <img src="${logoUrl}" class="logo" alt="Brand Logo" />
+          <h1>Payment Receipt</h1>
+          <div class="info"><strong>Reference:</strong> ${transactionData.reference}</div>
+          <div class="info"><strong>Amount:</strong> ₦${(transactionData.amount / 100).toLocaleString()}</div>
+          <div class="info"><strong>Status:</strong> ${transactionData.status}</div>
+          <div class="info"><strong>Paid At:</strong> ${transactionData.paid_at}</div>
+          <div class="info"><strong>Email:</strong> ${transactionData.customer?.email || 'N/A'}</div>
+        </body>
+      </html>
+    `);
+  
     receiptWindow.document.close();
     receiptWindow.print();
   }
+  
 }

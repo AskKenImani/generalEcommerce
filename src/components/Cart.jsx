@@ -3,21 +3,45 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import CheckoutForm from './CheckoutForm';
+import { PaystackService } from '../services/PaystackService';
+import { useUserProfile } from '../hooks/useUserProfile';
 import styles from './Cart.module.css';
 
 const Cart = ({ onClose }) => {
   const { items, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart();
-  const [showCheckout, setShowCheckout] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { profile } = useUserProfile();
 
   const handleCheckout = () => {
-    setShowCheckout(true);
-  };
+    if (items.length === 0) return;
 
-  const handleCheckoutSuccess = (result) => {
-    setShowCheckout(false);
-    onClose();
-    alert(`Payment successful! Order ID: ${result.orderId}`);
+    setIsProcessing(true);
+
+    const email = profile?.email || 'customer@example.com';
+    const metadata = {
+      cartItems: items.map(item => ({ name: item.name, quantity: item.quantity }))
+    };
+
+    PaystackService.initializePayment({
+      email,
+      amount: totalPrice,
+      metadata,
+      onSuccess: (transaction) => {
+        try {
+          clearCart();
+          onClose();
+          alert('Payment successful! Receipt is being downloaded.');
+        } catch (err) {
+          console.error('Error in onSuccess:', err);
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      onCancel: () => {
+        alert('Payment cancelled.');
+        setIsProcessing(false);
+      }
+    });
   };
 
   return (
@@ -85,7 +109,7 @@ const Cart = ({ onClose }) => {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className={styles.total}>
                   <div className={styles.totalRow}>
                     <span className={styles.totalLabel}>Total:</span>
@@ -93,13 +117,14 @@ const Cart = ({ onClose }) => {
                       ₦{totalPrice.toLocaleString()}
                     </span>
                   </div>
-                  
+
                   <div className={styles.actions}>
                     <Button
                       onClick={handleCheckout}
+                      disabled={isProcessing}
                       className={styles.checkoutBtn}
                     >
-                      Proceed to Checkout
+                      {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
                     </Button>
                     <Button
                       variant="outline"
@@ -115,13 +140,6 @@ const Cart = ({ onClose }) => {
           </CardContent>
         </Card>
       </div>
-
-      {showCheckout && (
-        <CheckoutForm
-          onClose={() => setShowCheckout(false)}
-          onSuccess={handleCheckoutSuccess}
-        />
-      )}
     </>
   );
 };
