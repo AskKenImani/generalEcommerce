@@ -17,7 +17,6 @@ const Landing = () => {
   useEffect(() => {
     if (!api) return;
 
-    // Auto-scroll carousel every 3 seconds
     const interval = setInterval(() => {
       api.scrollNext();
     }, 3000);
@@ -57,9 +56,19 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-orange-50 to-amber-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Hero Section with Animated Background */}
+      <section className="relative overflow-hidden py-20">
+        {/* Animated Background */}
+        <div
+          className="absolute inset-0 z-0 bg-repeat opacity-10 animate-bgMove pointer-events-none"
+          style={{
+            backgroundImage: "url('https://www.shutterstock.com/shutterstock/photos/178058330/display_1500/stock-vector-seamless-woman-s-fashion-accessory-bags-and-shoes-wallpaper-pattern-background-vector-illustration-178058330.jpg')",
+            backgroundSize: "300px",
+          }}
+        />
+
+        {/* Foreground Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Grow Your Business
             <span className="bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent"> Online</span>
@@ -75,17 +84,23 @@ const Landing = () => {
         </div>
       </section>
 
+
       {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Everything you need to succeed
-            </h2>
-            <p className="text-xl text-gray-600">
-              Powerful tools designed for modern e-commerce businesses
-            </p>
-          </div>
+      <section className="relative overflow-hidden py-20">
+        <div
+          className="absolute inset-0 z-0 bg-repeat opacity-10 animate-bgMove pointer-events-none"
+          style={{
+            backgroundImage: "url('https://thumbs.dreamstime.com/b/women-clothes-accessories-hand-drawn-doodle-seamless-pattern-vector-cute-s-clothing-lingerie-lipstick-bags-shoes-etc-107789034.jpg')",
+            backgroundSize: "300px",
+          }}
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Everything you need to succeed
+          </h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Powerful tools designed for modern e-commerce businesses
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
@@ -103,9 +118,16 @@ const Landing = () => {
       </section>
 
       {/* Reviews Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="relative overflow-hidden py-20">
+        <div
+          className="absolute inset-0 z-0 bg-repeat opacity-10 animate-bgMove pointer-events-none"
+          style={{
+            backgroundImage: "url('https://images.freeimages.com/clg/istock/previews/1012/101299295-fashion-shopping-background-with-women-shoes-bags-and-accessories.jpg')",
+            backgroundSize: "300px",
+          }}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               What our customers say
             </h2>
@@ -160,8 +182,15 @@ const Landing = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-20">
+        <div
+          className="absolute inset-0 z-0 bg-repeat opacity-10 animate-bgMove pointer-events-none"
+          style={{
+            backgroundImage: "url('https://www.shutterstock.com/shutterstock/photos/178058330/display_1500/stock-vector-seamless-woman-s-fashion-accessory-bags-and-shoes-wallpaper-pattern-background-vector-illustration-178058330.jpg')",
+            backgroundSize: "300px",
+          }}
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Get in touch
