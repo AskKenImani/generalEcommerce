@@ -3,7 +3,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { PaystackService } from '../services/PaystackService';
+import { PaystackService } from '../services/paystackService';
 import { useUserProfile } from '../hooks/useUserProfile';
 import styles from './Cart.module.css';
 
